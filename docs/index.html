@@ -6,26 +6,36 @@
     <title>Habit Tracker</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Arial', sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #f0f8ff;
-            color: #333;
+            background-color: #121212;
+            color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
         header {
-            background-color: #4CAF50;
-            color: white;
-            padding: 15px;
+            background-color: #1f1f1f;
+            color: #61dafb;
+            padding: 20px;
             text-align: center;
-            font-size: 1.5em;
+            font-size: 2rem;
+            width: 100%;
         }
         .container {
             margin: 20px;
-            max-width: 800px;
-            background-color: white;
+            max-width: 1200px;
+            width: 100%;
+            background-color: #1e1e2e;
             padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+        }
+        h2 {
+            color: #61dafb;
+            text-align: center;
+            margin-bottom: 20px;
         }
         .form-group {
             margin-bottom: 15px;
@@ -39,8 +49,18 @@
             width: 100%;
             padding: 10px;
             margin: 5px 0;
-            border: 1px solid #ccc;
-            border-radius: 4px;
+            border: 1px solid #444;
+            border-radius: 5px;
+            font-size: 1em;
+            background-color: #333;
+            color: #fff;
+        }
+        button {
+            background-color: #61dafb;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #7ddfff;
         }
         table {
             width: 100%;
@@ -48,20 +68,43 @@
             margin-top: 20px;
         }
         th, td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: left;
+            border: 1px solid #444;
+            padding: 10px;
+            text-align: center;
         }
         th {
-            background-color: #4CAF50;
-            color: white;
+            background-color: #1f1f1f;
+            color: #61dafb;
         }
         .coin-display {
             text-align: center;
             margin: 20px 0;
-            font-size: 1.5em;
-            color: #4CAF50;
+            font-size: 1.8em;
+            color: #f4e04d;
             font-weight: bold;
+        }
+        .section {
+            margin-bottom: 40px;
+        }
+        .grid {
+            display: flex;
+            gap: 20px;
+            justify-content: space-around;
+            flex-wrap: wrap;
+        }
+        .card {
+            background-color: #292a3a;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+            max-width: 300px;
+            text-align: center;
+        }
+        .card button {
+            margin-top: 10px;
+        }
+        audio {
+            display: none;
         }
     </style>
 </head>
@@ -71,141 +114,165 @@
     </header>
     <div class="container">
         <div class="coin-display">
-            Coins samlet: <span id="total-coins">0</span>
+            Coins: <span id="total-coins">0</span>
         </div>
 
-        <h2>Opret en vane</h2>
-        <div class="form-group">
-            <label for="habit-name">Vane navn:</label>
-            <input type="text" id="habit-name" placeholder="Navn på vanen">
+        <div class="section">
+            <h2>Add a Habit</h2>
+            <div class="form-group">
+                <label for="habit-name">Habit Name:</label>
+                <input type="text" id="habit-name" placeholder="Enter habit name">
+            </div>
+            <div class="form-group">
+                <label for="habit-type">Habit Type:</label>
+                <select id="habit-type" onchange="toggleHabitOptions()">
+                    <option value="repeating">Repeating</option>
+                    <option value="one-time">One-Time</option>
+                </select>
+            </div>
+            <div class="form-group" id="habit-frequency-group">
+                <label for="habit-frequency">Frequency:</label>
+                <select id="habit-frequency">
+                    <option value="daily">Daily</option>
+                    <option value="weekly">Weekly</option>
+                    <option value="monthly">Monthly</option>
+                    <option value="custom">Custom</option>
+                </select>
+            </div>
+            <div class="form-group" id="custom-frequency-group" style="display:none;">
+                <label for="custom-frequency">Custom Days (e.g., Mon, Wed, Fri):</label>
+                <input type="text" id="custom-frequency" placeholder="Enter custom days">
+            </div>
+            <div class="form-group">
+                <label for="habit-points">Points/Coins (Earned/Lost):</label>
+                <input type="number" id="habit-points" placeholder="Enter points">
+            </div>
+            <button onclick="addHabit()">Add Habit</button>
         </div>
-        <div class="form-group">
-            <label for="habit-type">Vane type:</label>
-            <select id="habit-type">
-                <option value="repeating">Gentagende</option>
-                <option value="increase">Gør mere</option>
-                <option value="decrease">Gør mindre</option>
-                <option value="one-time">Én gangs</option>
-            </select>
-        </div>
-        <div class="form-group">
-            <label for="habit-frequency">Hyppighed (hvis gentagende):</label>
-            <select id="habit-frequency">
-                <option value="daily">Dagligt</option>
-                <option value="weekly">Ugentligt</option>
-                <option value="monthly">Månedligt</option>
-            </select>
-        </div>
-        <div class="form-group">
-            <label for="habit-points">Point/Coins:</label>
-            <input type="number" id="habit-points" placeholder="Point værdi">
-        </div>
-        <button onclick="addHabit()">Tilføj vane</button>
 
-        <h2>Liste over vaner</h2>
-        <table id="habit-table">
-            <thead>
-                <tr>
-                    <th>Vane</th>
-                    <th>Type</th>
-                    <th>Hyppighed</th>
-                    <th>Point</th>
-                    <th>Handling</th>
-                </tr>
-            </thead>
-            <tbody>
-            </tbody>
-        </table>
-
-        <h2>Ønsker</h2>
-        <div class="form-group">
-            <label for="wish-name">Ønske navn:</label>
-            <input type="text" id="wish-name" placeholder="Navn på ønsket">
+        <div class="section">
+            <h2>Your Habits</h2>
+            <div class="grid" id="habit-list">
+            </div>
         </div>
-        <div class="form-group">
-            <label for="wish-cost">Koster coins:</label>
-            <input type="number" id="wish-cost" placeholder="Coins værdi">
-        </div>
-        <button onclick="addWish()">Tilføj ønske</button>
 
-        <h2>Liste over ønsker</h2>
-        <table id="wish-table">
-            <thead>
-                <tr>
-                    <th>Ønske</th>
-                    <th>Koster</th>
-                    <th>Handling</th>
-                </tr>
-            </thead>
-            <tbody>
-            </tbody>
-        </table>
+        <div class="section">
+            <h2>Rewards</h2>
+            <div class="form-group">
+                <label for="reward-name">Reward Name:</label>
+                <input type="text" id="reward-name" placeholder="Enter reward name">
+            </div>
+            <div class="form-group">
+                <label for="reward-cost">Cost in Coins:</label>
+                <input type="number" id="reward-cost" placeholder="Enter reward cost">
+            </div>
+            <button onclick="addReward()">Add Reward</button>
+        </div>
+
+        <div class="section">
+            <h2>Your Rewards</h2>
+            <div class="grid" id="reward-list">
+            </div>
+        </div>
     </div>
+
+    <audio id="success-sound" src="https://www.soundjay.com/button/sounds/button-4.mp3"></audio>
 
     <script>
         let totalCoins = 0;
         const coinDisplay = document.getElementById('total-coins');
-        const habitTable = document.getElementById('habit-table').querySelector('tbody');
-        const wishTable = document.getElementById('wish-table').querySelector('tbody');
+        const habitList = document.getElementById('habit-list');
+        const rewardList = document.getElementById('reward-list');
+
+        function toggleHabitOptions() {
+            const habitType = document.getElementById('habit-type').value;
+            const frequencyGroup = document.getElementById('habit-frequency-group');
+            const customFrequencyGroup = document.getElementById('custom-frequency-group');
+            if (habitType === 'one-time') {
+                frequencyGroup.style.display = 'none';
+                customFrequencyGroup.style.display = 'none';
+            } else {
+                frequencyGroup.style.display = 'block';
+                const frequency = document.getElementById('habit-frequency').value;
+                if (frequency === 'custom') {
+                    customFrequencyGroup.style.display = 'block';
+                } else {
+                    customFrequencyGroup.style.display = 'none';
+                }
+            }
+        }
 
         function addHabit() {
             const name = document.getElementById('habit-name').value;
             const type = document.getElementById('habit-type').value;
             const frequency = document.getElementById('habit-frequency').value;
+            const customFrequency = document.getElementById('custom-frequency').value;
             const points = parseInt(document.getElementById('habit-points').value);
 
             if (name && !isNaN(points)) {
-                const row = habitTable.insertRow();
-                row.innerHTML = `
-                    <td>${name}</td>
-                    <td>${type}</td>
-                    <td>${type === 'repeating' ? frequency : '-'}</td>
-                    <td>${points}</td>
-                    <td><button onclick="completeHabit(this, ${points})">Færdig</button></td>
+                const habitCard = document.createElement('div');
+                habitCard.className = 'card';
+                habitCard.innerHTML = `
+                    <h3>${name}</h3>
+                    <p>Type: ${type}</p>
+                    <p>Frequency: ${type === 'repeating' ? (frequency === 'custom' ? customFrequency : frequency) : '-'}</p>
+                    <p>Points: ${points}</p>
+                    <button onclick="completeHabit(${points})">Complete</button>
+                    <button onclick="failHabit(${points})">Fail</button>
                 `;
+                habitList.appendChild(habitCard);
 
                 document.getElementById('habit-name').value = '';
                 document.getElementById('habit-type').value = 'repeating';
                 document.getElementById('habit-frequency').value = 'daily';
+                document.getElementById('custom-frequency').value = '';
                 document.getElementById('habit-points').value = '';
+                toggleHabitOptions();
             } else {
-                alert('Udfyld alle felter korrekt!');
+                alert('Please fill out all fields correctly!');
             }
         }
 
-        function completeHabit(button, points) {
+        function completeHabit(points) {
             totalCoins += points;
             coinDisplay.textContent = totalCoins;
-            button.disabled = true;
+            document.getElementById('success-sound').play();
         }
 
-        function addWish() {
-            const name = document.getElementById('wish-name').value;
-            const cost = parseInt(document.getElementById('wish-cost').value);
+        function failHabit(points) {
+            totalCoins -= points;
+            if (totalCoins < 0) totalCoins = 0;
+            coinDisplay.textContent = totalCoins;
+        }
+
+        function addReward() {
+            const name = document.getElementById('reward-name').value;
+            const cost = parseInt(document.getElementById('reward-cost').value);
 
             if (name && !isNaN(cost)) {
-                const row = wishTable.insertRow();
-                row.innerHTML = `
-                    <td>${name}</td>
-                    <td>${cost}</td>
-                    <td><button onclick="redeemWish(this, ${cost})">Indløs</button></td>
+                const rewardCard = document.createElement('div');
+                rewardCard.className = 'card';
+                rewardCard.innerHTML = `
+                    <h3>${name}</h3>
+                    <p>Cost: ${cost} coins</p>
+                    <button onclick="redeemReward(${cost})">Redeem</button>
                 `;
+                rewardList.appendChild(rewardCard);
 
-                document.getElementById('wish-name').value = '';
-                document.getElementById('wish-cost').value = '';
+                document.getElementById('reward-name').value = '';
+                document.getElementById('reward-cost').value = '';
             } else {
-                alert('Udfyld alle felter korrekt!');
+                alert('Please fill out all fields correctly!');
             }
         }
 
-        function redeemWish(button, cost) {
+        function redeemReward(cost) {
             if (totalCoins >= cost) {
                 totalCoins -= cost;
                 coinDisplay.textContent = totalCoins;
-                button.disabled = true;
-                alert('Ønske indløst!');
+                alert('Reward redeemed!');
             } else {
-                alert('Ikke nok coins!');
+                alert('Not enough coins!');
             }
         }
     </script>
