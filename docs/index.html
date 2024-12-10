@@ -123,6 +123,49 @@
             background-color: #ff5c5c;
             margin-top: 10px;
         }
+        .coin-input {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .coin-input input {
+            width: 45%;
+        }
+        .btn-positive {
+            background-color: #4caf50;
+            color: #fff;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .btn-negative {
+            background-color: #f44336;
+            color: #fff;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .notification {
+            position: fixed;
+            top: 10%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #fff;
+            border: 2px solid #6a5acd;
+            color: #6a5acd;
+            padding: 10px 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            z-index: 20;
+            display: none;
+        }
+        .notification.negative {
+            border-color: #f44336;
+            color: #f44336;
+        }
     </style>
 </head>
 <body>
@@ -134,19 +177,19 @@
         <img src="https://img.icons8.com/emoji/48/coin-emoji.png" alt="Coins">
     </div>
     <div class="main-container">
-        <div class="section" id="habits-section">
-            <h2>Habits</h2>
+        <div class="section" id="repeating-habits-section">
+            <h2>Repeating Habits</h2>
             <div class="habit-list">
                 <div class="habit">
                     <span>Drink Water</span>
-                    <button onclick="addCoins(5)">+5 Coins</button>
+                    <button class="btn-positive" onclick="addCoins(5, 'Well done! Keep it up!')">+5 Coins</button>
                 </div>
                 <div class="habit">
                     <span>Exercise</span>
-                    <button onclick="addCoins(10)">+10 Coins</button>
+                    <button class="btn-positive" onclick="addCoins(10, 'Great job staying active!')">+10 Coins</button>
                 </div>
             </div>
-            <div class="add-button" onclick="showModal('habit-modal')">+ Add Habit</div>
+            <div class="add-button" onclick="showModal('habit-modal')">+ Add Repeating Habit</div>
         </div>
 
         <div class="section" id="tasks-section">
@@ -154,11 +197,11 @@
             <div class="task-list">
                 <div class="task">
                     <span>Read for 30 mins</span>
-                    <button onclick="addCoins(3)">+3 Coins</button>
+                    <button class="btn-positive" onclick="addCoins(3, 'Reading is the key to knowledge!')">+3 Coins</button>
                 </div>
                 <div class="task">
                     <span>Stretch</span>
-                    <button onclick="addCoins(2)">+2 Coins</button>
+                    <button class="btn-positive" onclick="addCoins(2, 'Good stretch!')">+2 Coins</button>
                 </div>
             </div>
             <div class="add-button" onclick="showModal('daily-modal')">+ Add Daily</div>
@@ -169,11 +212,11 @@
             <div class="task-list">
                 <div class="task">
                     <span>File Taxes</span>
-                    <button onclick="addCoins(15)">+15 Coins</button>
+                    <button class="btn-positive" onclick="addCoins(15, 'Taxes done! You're responsible!')">+15 Coins</button>
                 </div>
                 <div class="task">
                     <span>Clean the House</span>
-                    <button onclick="addCoins(10)">+10 Coins</button>
+                    <button class="btn-positive" onclick="addCoins(10, 'Clean house, clear mind!')">+10 Coins</button>
                 </div>
             </div>
             <div class="add-button" onclick="showModal('todo-modal')">+ Add To-Do</div>
@@ -184,11 +227,11 @@
             <div class="reward-list">
                 <div class="reward">
                     <span>Chocolate Bar</span>
-                    <button onclick="redeemReward(10)">10 Coins</button>
+                    <button onclick="redeemReward(10, 'Enjoy your treat! 🍫')">10 Coins</button>
                 </div>
                 <div class="reward">
                     <span>Movie Night</span>
-                    <button onclick="redeemReward(20)">20 Coins</button>
+                    <button onclick="redeemReward(20, 'Have fun at the movies! 🎥')">20 Coins</button>
                 </div>
             </div>
             <div class="add-button" onclick="showModal('reward-modal')">+ Add Reward</div>
@@ -197,41 +240,56 @@
 
     <div id="habit-modal" class="modal">
         <div class="modal-content">
-            <h3>Create Habit</h3>
+            <h3>Create Repeating Habit</h3>
             <label for="habit-title">Title</label>
             <input type="text" id="habit-title" placeholder="Enter habit title">
             <label for="habit-type">Type</label>
             <select id="habit-type">
-                <option value="positive">Positive</option>
-                <option value="negative">Negative</option>
-                <option value="both">Both</option>
+                <option value="positive">Positive (+)</option>
+                <option value="negative">Negative (-)</option>
+                <option value="both">Both (+/-)</option>
             </select>
-            <label for="habit-difficulty">Difficulty</label>
-            <select id="habit-difficulty">
-                <option value="easy">Easy</option>
-                <option value="medium">Medium</option>
-                <option value="hard">Hard</option>
-            </select>
+            <div class="coin-input">
+                <label for="habit-positive-coins">Positive Coins</label>
+                <input type="number" id="habit-positive-coins" placeholder="Enter positive coins">
+            </div>
+            <div class="coin-input" id="negative-coins-input" style="display: none;">
+                <label for="habit-negative-coins">Negative Coins</label>
+                <input type="number" id="habit-negative-coins" placeholder="Enter negative coins">
+            </div>
             <button onclick="saveHabit()">Create</button>
             <button class="close-button" onclick="closeModal('habit-modal')">Cancel</button>
         </div>
     </div>
 
+    <div id="notification" class="notification"></div>
+
     <script>
         let totalCoins = 0;
 
-        function addCoins(amount) {
-            totalCoins += amount;
-            document.getElementById('total-coins').innerText = totalCoins;
+        function showNotification(message, isNegative = false) {
+            const notification = document.getElementById('notification');
+            notification.innerText = message;
+            notification.style.display = 'block';
+            notification.classList.toggle('negative', isNegative);
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 2000);
         }
 
-        function redeemReward(cost) {
+        function addCoins(amount, message) {
+            totalCoins += amount;
+            document.getElementById('total-coins').innerText = totalCoins;
+            showNotification(message);
+        }
+
+        function redeemReward(cost, message) {
             if (totalCoins >= cost) {
                 totalCoins -= cost;
                 document.getElementById('total-coins').innerText = totalCoins;
-                alert('Reward redeemed!');
+                showNotification(message);
             } else {
-                alert('Not enough coins!');
+                showNotification('Not enough coins!', true);
             }
         }
 
@@ -246,10 +304,29 @@
         function saveHabit() {
             const title = document.getElementById('habit-title').value;
             const type = document.getElementById('habit-type').value;
-            const difficulty = document.getElementById('habit-difficulty').value;
-            alert(`Habit Saved: ${title}, Type: ${type}, Difficulty: ${difficulty}`);
+            const positiveCoins = parseInt(document.getElementById('habit-positive-coins').value) || 0;
+            const negativeCoins = parseInt(document.getElementById('habit-negative-coins').value) || 0;
+
+            if (type === 'positive') {
+                alert(`Habit Saved: ${title}, Positive Coins: ${positiveCoins}`);
+            } else if (type === 'negative') {
+                alert(`Habit Saved: ${title}, Negative Coins: ${negativeCoins}`);
+            } else {
+                alert(`Habit Saved: ${title}, Positive Coins: ${positiveCoins}, Negative Coins: ${negativeCoins}`);
+            }
+
             closeModal('habit-modal');
         }
+
+        document.getElementById('habit-type').addEventListener('change', function () {
+            const type = this.value;
+            const negativeInput = document.getElementById('negative-coins-input');
+            if (type === 'negative' || type === 'both') {
+                negativeInput.style.display = 'block';
+            } else {
+                negativeInput.style.display = 'none';
+            }
+        });
     </script>
 </body>
 </html>
