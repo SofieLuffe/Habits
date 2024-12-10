@@ -9,16 +9,23 @@
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #f5f5f5;
+            background-color: #f0f8ff;
+            color: #333;
         }
         header {
             background-color: #4CAF50;
             color: white;
-            padding: 10px;
+            padding: 15px;
             text-align: center;
+            font-size: 1.5em;
         }
         .container {
             margin: 20px;
+            max-width: 800px;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
         .form-group {
             margin-bottom: 15px;
@@ -26,11 +33,14 @@
         label {
             display: block;
             margin-bottom: 5px;
+            font-weight: bold;
         }
         input, select, button {
             width: 100%;
             padding: 10px;
             margin: 5px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
         }
         table {
             width: 100%;
@@ -46,6 +56,13 @@
             background-color: #4CAF50;
             color: white;
         }
+        .coin-display {
+            text-align: center;
+            margin: 20px 0;
+            font-size: 1.5em;
+            color: #4CAF50;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
@@ -53,6 +70,10 @@
         <h1>Habit Tracker</h1>
     </header>
     <div class="container">
+        <div class="coin-display">
+            Coins samlet: <span id="total-coins">0</span>
+        </div>
+
         <h2>Opret en vane</h2>
         <div class="form-group">
             <label for="habit-name">Vane navn:</label>
@@ -68,6 +89,14 @@
             </select>
         </div>
         <div class="form-group">
+            <label for="habit-frequency">Hyppighed (hvis gentagende):</label>
+            <select id="habit-frequency">
+                <option value="daily">Dagligt</option>
+                <option value="weekly">Ugentligt</option>
+                <option value="monthly">Månedligt</option>
+            </select>
+        </div>
+        <div class="form-group">
             <label for="habit-points">Point/Coins:</label>
             <input type="number" id="habit-points" placeholder="Point værdi">
         </div>
@@ -79,6 +108,7 @@
                 <tr>
                     <th>Vane</th>
                     <th>Type</th>
+                    <th>Hyppighed</th>
                     <th>Point</th>
                     <th>Handling</th>
                 </tr>
@@ -113,12 +143,15 @@
     </div>
 
     <script>
+        let totalCoins = 0;
+        const coinDisplay = document.getElementById('total-coins');
         const habitTable = document.getElementById('habit-table').querySelector('tbody');
         const wishTable = document.getElementById('wish-table').querySelector('tbody');
 
         function addHabit() {
             const name = document.getElementById('habit-name').value;
             const type = document.getElementById('habit-type').value;
+            const frequency = document.getElementById('habit-frequency').value;
             const points = parseInt(document.getElementById('habit-points').value);
 
             if (name && !isNaN(points)) {
@@ -126,16 +159,24 @@
                 row.innerHTML = `
                     <td>${name}</td>
                     <td>${type}</td>
+                    <td>${type === 'repeating' ? frequency : '-'}</td>
                     <td>${points}</td>
-                    <td><button onclick="deleteRow(this)">Slet</button></td>
+                    <td><button onclick="completeHabit(this, ${points})">Færdig</button></td>
                 `;
 
                 document.getElementById('habit-name').value = '';
                 document.getElementById('habit-type').value = 'repeating';
+                document.getElementById('habit-frequency').value = 'daily';
                 document.getElementById('habit-points').value = '';
             } else {
                 alert('Udfyld alle felter korrekt!');
             }
+        }
+
+        function completeHabit(button, points) {
+            totalCoins += points;
+            coinDisplay.textContent = totalCoins;
+            button.disabled = true;
         }
 
         function addWish() {
@@ -147,7 +188,7 @@
                 row.innerHTML = `
                     <td>${name}</td>
                     <td>${cost}</td>
-                    <td><button onclick="deleteRow(this)">Slet</button></td>
+                    <td><button onclick="redeemWish(this, ${cost})">Indløs</button></td>
                 `;
 
                 document.getElementById('wish-name').value = '';
@@ -157,9 +198,15 @@
             }
         }
 
-        function deleteRow(button) {
-            const row = button.parentElement.parentElement;
-            row.parentElement.removeChild(row);
+        function redeemWish(button, cost) {
+            if (totalCoins >= cost) {
+                totalCoins -= cost;
+                coinDisplay.textContent = totalCoins;
+                button.disabled = true;
+                alert('Ønske indløst!');
+            } else {
+                alert('Ikke nok coins!');
+            }
         }
     </script>
 </body>
