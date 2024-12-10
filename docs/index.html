@@ -9,31 +9,32 @@
             font-family: 'Arial', sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #121212;
-            color: #ffffff;
+            background-color: #f4f4f9;
+            color: #333;
             display: flex;
             flex-direction: column;
             align-items: center;
         }
         header {
-            background-color: #1f1f1f;
-            color: #61dafb;
+            background-color: #6c63ff;
+            color: #fff;
             padding: 20px;
             text-align: center;
             font-size: 2rem;
             width: 100%;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
         }
         .container {
             margin: 20px;
             max-width: 1200px;
-            width: 100%;
-            background-color: #1e1e2e;
+            width: 90%;
+            background-color: #fff;
             padding: 20px;
             border-radius: 10px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
         }
         h2 {
-            color: #61dafb;
+            color: #6c63ff;
             text-align: center;
             margin-bottom: 20px;
         }
@@ -49,18 +50,27 @@
             width: 100%;
             padding: 10px;
             margin: 5px 0;
-            border: 1px solid #444;
+            border: 1px solid #ddd;
             border-radius: 5px;
             font-size: 1em;
-            background-color: #333;
-            color: #fff;
+            background-color: #f9f9f9;
+            color: #333;
         }
         button {
-            background-color: #61dafb;
+            background-color: #6c63ff;
+            color: #fff;
             cursor: pointer;
+            transition: background-color 0.3s;
         }
         button:hover {
-            background-color: #7ddfff;
+            background-color: #857dff;
+        }
+        .add-button {
+            font-size: 1.5em;
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         table {
             width: 100%;
@@ -68,20 +78,28 @@
             margin-top: 20px;
         }
         th, td {
-            border: 1px solid #444;
+            border: 1px solid #ddd;
             padding: 10px;
             text-align: center;
         }
         th {
-            background-color: #1f1f1f;
-            color: #61dafb;
+            background-color: #6c63ff;
+            color: #fff;
         }
         .coin-display {
             text-align: center;
             margin: 20px 0;
-            font-size: 1.8em;
-            color: #f4e04d;
+            font-size: 2em;
+            color: #6c63ff;
             font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .coin-display img {
+            width: 40px;
+            height: 40px;
+            margin-left: 10px;
         }
         .section {
             margin-bottom: 40px;
@@ -93,12 +111,16 @@
             flex-wrap: wrap;
         }
         .card {
-            background-color: #292a3a;
+            background-color: #f9f9f9;
             padding: 20px;
             border-radius: 8px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
             max-width: 300px;
             text-align: center;
+            transition: transform 0.3s;
+        }
+        .card:hover {
+            transform: translateY(-10px);
         }
         .card button {
             margin-top: 10px;
@@ -115,39 +137,44 @@
     <div class="container">
         <div class="coin-display">
             Coins: <span id="total-coins">0</span>
+            <img src="https://img.icons8.com/emoji/48/coin-emoji.png" alt="Coins">
         </div>
 
         <div class="section">
-            <h2>Add a Habit</h2>
-            <div class="form-group">
-                <label for="habit-name">Habit Name:</label>
-                <input type="text" id="habit-name" placeholder="Enter habit name">
+            <h2>Manage Habits</h2>
+            <button class="add-button" onclick="showAddHabitForm()">+ Add Habit</button>
+            <div id="habit-form" style="display:none;">
+                <div class="form-group">
+                    <label for="habit-name">Habit Name:</label>
+                    <input type="text" id="habit-name" placeholder="Enter habit name">
+                </div>
+                <div class="form-group">
+                    <label for="habit-type">Habit Type:</label>
+                    <select id="habit-type" onchange="toggleHabitOptions()">
+                        <option value="repeating">Repeating</option>
+                        <option value="one-time">One-Time</option>
+                    </select>
+                </div>
+                <div class="form-group" id="habit-frequency-group">
+                    <label for="habit-frequency">Frequency:</label>
+                    <select id="habit-frequency">
+                        <option value="daily">Daily</option>
+                        <option value="weekly">Weekly</option>
+                        <option value="monthly">Monthly</option>
+                        <option value="custom">Custom</option>
+                    </select>
+                </div>
+                <div class="form-group" id="custom-frequency-group" style="display:none;">
+                    <label for="custom-frequency">Custom Days (e.g., Mon, Wed, Fri):</label>
+                    <input type="text" id="custom-frequency" placeholder="Enter custom days">
+                </div>
+                <div class="form-group">
+                    <label for="habit-points">Points/Coins (Earned/Lost):</label>
+                    <input type="number" id="habit-points" placeholder="Enter points">
+                </div>
+                <button onclick="addHabit()">Add Habit</button>
+                <button onclick="hideAddHabitForm()">Cancel</button>
             </div>
-            <div class="form-group">
-                <label for="habit-type">Habit Type:</label>
-                <select id="habit-type" onchange="toggleHabitOptions()">
-                    <option value="repeating">Repeating</option>
-                    <option value="one-time">One-Time</option>
-                </select>
-            </div>
-            <div class="form-group" id="habit-frequency-group">
-                <label for="habit-frequency">Frequency:</label>
-                <select id="habit-frequency">
-                    <option value="daily">Daily</option>
-                    <option value="weekly">Weekly</option>
-                    <option value="monthly">Monthly</option>
-                    <option value="custom">Custom</option>
-                </select>
-            </div>
-            <div class="form-group" id="custom-frequency-group" style="display:none;">
-                <label for="custom-frequency">Custom Days (e.g., Mon, Wed, Fri):</label>
-                <input type="text" id="custom-frequency" placeholder="Enter custom days">
-            </div>
-            <div class="form-group">
-                <label for="habit-points">Points/Coins (Earned/Lost):</label>
-                <input type="number" id="habit-points" placeholder="Enter points">
-            </div>
-            <button onclick="addHabit()">Add Habit</button>
         </div>
 
         <div class="section">
@@ -157,16 +184,20 @@
         </div>
 
         <div class="section">
-            <h2>Rewards</h2>
-            <div class="form-group">
-                <label for="reward-name">Reward Name:</label>
-                <input type="text" id="reward-name" placeholder="Enter reward name">
+            <h2>Manage Rewards</h2>
+            <button class="add-button" onclick="showAddRewardForm()">+ Add Reward</button>
+            <div id="reward-form" style="display:none;">
+                <div class="form-group">
+                    <label for="reward-name">Reward Name:</label>
+                    <input type="text" id="reward-name" placeholder="Enter reward name">
+                </div>
+                <div class="form-group">
+                    <label for="reward-cost">Cost in Coins:</label>
+                    <input type="number" id="reward-cost" placeholder="Enter reward cost">
+                </div>
+                <button onclick="addReward()">Add Reward</button>
+                <button onclick="hideAddRewardForm()">Cancel</button>
             </div>
-            <div class="form-group">
-                <label for="reward-cost">Cost in Coins:</label>
-                <input type="number" id="reward-cost" placeholder="Enter reward cost">
-            </div>
-            <button onclick="addReward()">Add Reward</button>
         </div>
 
         <div class="section">
@@ -202,6 +233,22 @@
             }
         }
 
+        function showAddHabitForm() {
+            document.getElementById('habit-form').style.display = 'block';
+        }
+
+        function hideAddHabitForm() {
+            document.getElementById('habit-form').style.display = 'none';
+        }
+
+        function showAddRewardForm() {
+            document.getElementById('reward-form').style.display = 'block';
+        }
+
+        function hideAddRewardForm() {
+            document.getElementById('reward-form').style.display = 'none';
+        }
+
         function addHabit() {
             const name = document.getElementById('habit-name').value;
             const type = document.getElementById('habit-type').value;
@@ -228,6 +275,7 @@
                 document.getElementById('custom-frequency').value = '';
                 document.getElementById('habit-points').value = '';
                 toggleHabitOptions();
+                hideAddHabitForm();
             } else {
                 alert('Please fill out all fields correctly!');
             }
@@ -261,6 +309,7 @@
 
                 document.getElementById('reward-name').value = '';
                 document.getElementById('reward-cost').value = '';
+                hideAddRewardForm();
             } else {
                 alert('Please fill out all fields correctly!');
             }
